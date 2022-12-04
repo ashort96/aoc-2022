@@ -29,5 +29,5 @@ object Main extends App {
     if (left.intersect(right).size > 0) 1 else 0
   })
 
-  println(s"Part 1: $part2")
+  println(s"Part 2: $part2")
 }
