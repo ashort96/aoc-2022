@@ -3,19 +3,13 @@ import scala.io.Source
 object Main extends App {
   val filename = "input.txt"
 
-  def findOverlap(lines: List[List[List[Int]]], callback: (Set[Int], Set[Int]) => Int) = {
+  def findOverlap(lines: List[List[(Int, Int)]], callback: ((Int, Int), (Int, Int)) => Int) = {
     lines.map { line =>
-      line match {
-        case List(List(a, b), List(c, d)) =>
-          val left = a.to(b).toSet
-          val right = c.to(d).toSet
-          callback(left, right)
-        case List(_) | Nil => throw new RuntimeException("Unexpected case")
-      }
+      callback(line.head, line.last)
     }.sum
   }
   
-  val lines: List[List[List[Int]]] = Source.fromResource(filename)
+  val lines: List[List[(Int, Int)]] = Source.fromResource(filename)
     .getLines()
     .toList
     .map{ line => 
@@ -26,18 +20,22 @@ object Main extends App {
         element
         .split('-')
         .map(_.toInt)
-        .toList
+        .toList match {
+          case List(a, b) => (a, b)
+        }
       }
     }
   
-  val part1 = findOverlap(lines, (left: Set[Int], right: Set[Int]) => {
-    if (left.subsetOf(right) || right.subsetOf(left)) 1 else 0
-  })
+    val part1 = findOverlap(lines, (left: (Int, Int), right: (Int, Int)) => {
+      if (left._1 <= right._1 && left._2 >= right._2) 1
+      else if (right._1 <= left._1 && right._2 >= left._2) 1
+      else 0 
+    })
 
   println(s"Part 1: $part1")
 
-  val part2 = findOverlap(lines, (left: Set[Int], right: Set[Int]) => {
-    if (left.intersect(right).size > 0) 1 else 0
+  val part2 = findOverlap(lines, (left: (Int, Int), right: (Int, Int)) => {
+    if ((left._2 >= right._1) && (left._1 <= right._2)) 1 else 0
   })
 
   println(s"Part 2: $part2")
